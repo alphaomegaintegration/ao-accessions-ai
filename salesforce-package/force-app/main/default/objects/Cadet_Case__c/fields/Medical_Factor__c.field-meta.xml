@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Medical_Factor__c</fullName>
+    <label>Medical Factor</label>
+    <type>Picklist</type>
+    <required>false</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>ADHD/anxiety medication history</fullName><default>false</default><label>ADHD/anxiety medication history</label></value>
+            <value><fullName>Asthma after age 13</fullName><default>false</default><label>Asthma after age 13</label></value>
+            <value><fullName>Prior orthopedic injury or surgery</fullName><default>false</default><label>Prior orthopedic injury or surgery</label></value>
+            <value><fullName>Vision correction (LASIK/PRK)</fullName><default>false</default><label>Vision correction (LASIK/PRK)</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

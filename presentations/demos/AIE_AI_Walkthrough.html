@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Omega — AIE Accessions AI Walkthrough</title>
+<style>
+  :root{
+    --navy:#0A1A30; --navy2:#0E2342; --panel:#12294a; --panel2:#16315a;
+    --line:#23477f; --ink:#eaf1fb; --muted:#9db4d4;
+    --accent:#FF7A1A; --accent2:#FFB347; --teal:#36C2CF; --green:#36D399;
+    --live:#36D399; --agent:#36C2CF; --pkg:#FFB347;
+    --shadow:0 18px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 700px at 80% -10%, #143058 0%, var(--navy) 55%) fixed;
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  .stage{height:100vh;display:flex;flex-direction:column}
+  /* Top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 34px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .brand{display:flex;align-items:center;gap:14px;font-weight:700;letter-spacing:.3px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo .mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a1205;font-size:15px}
+  .logo b{font-size:15px}
+  .logo span{color:var(--muted);font-weight:500;font-size:13px}
+  .topmeta{display:flex;align-items:center;gap:18px;font-size:12.5px;color:var(--muted)}
+  .pill{padding:5px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:11.5px;color:var(--muted)}
+  .pill b{color:var(--accent2)}
+  /* progress rail */
+  .rail{display:flex;gap:6px;padding:10px 34px;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto}
+  .rail button{appearance:none;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11.5px;padding:6px 10px;border-radius:7px;white-space:nowrap;font-family:inherit;transition:.2s}
+  .rail button:hover{color:var(--ink);background:rgba(255,255,255,.05)}
+  .rail button.active{color:#1a1205;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:700}
+  .rail .num{opacity:.6;margin-right:6px;font-variant-numeric:tabular-nums}
+  /* slides */
+  .slides{flex:1;position:relative;overflow:hidden}
+  .slide{position:absolute;inset:0;padding:34px 54px;overflow-y:auto;opacity:0;transform:translateY(18px);pointer-events:none;transition:opacity .45s ease,transform .45s ease}
+  .slide.active{opacity:1;transform:none;pointer-events:auto}
+  .slide::-webkit-scrollbar{width:9px}
+  .slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:6px}
+  .kicker{color:var(--accent2);font-size:12.5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px}
+  h1{font-size:42px;line-height:1.08;margin:0 0 14px;font-weight:800;letter-spacing:-.5px}
+  h2{font-size:30px;line-height:1.12;margin:0 0 16px;font-weight:800;letter-spacing:-.4px}
+  .lead{font-size:17px;color:var(--muted);max-width:820px;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto}
+  /* bottom nav */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 34px;border-top:1px solid rgba(255,255,255,.06)}
+  .nav .dots{display:flex;gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);transition:.2s}
+  .dot.active{background:var(--accent);width:22px;border-radius:6px}
+  .btn{appearance:none;font-family:inherit;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--ink);padding:10px 18px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:600;transition:.18s}
+  .btn:hover{background:rgba(255,255,255,.1)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#1a1205}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  /* cover */
+  .cover{display:flex;flex-direction:column;justify-content:center;height:100%}
+  .cover h1{font-size:54px;max-width:980px}
+  .cover .tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .tag{padding:8px 14px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:13px;color:var(--muted)}
+  .tag b{color:var(--ink)}
+  /* generic cards */
+  .grid{display:grid;gap:16px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 8px;font-size:16px}
+  .card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
+  .stat{font-size:40px;font-weight:800;letter-spacing:-1px}
+  .stat.accent{color:var(--accent2)}
+  .stat.green{color:var(--green)}
+  .small{font-size:12px;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+  .chip.live{background:rgba(54,211,153,.14);color:var(--live)}
+  .chip.agent{background:rgba(54,194,207,.14);color:var(--agent)}
+  .chip.pkg{background:rgba(255,179,71,.16);color:var(--pkg)}
+  .chip.rtm{background:rgba(255,255,255,.08);color:var(--muted);font-weight:600}
+  .dotmark{width:8px;height:8px;border-radius:50%}
+  /* problem before/after */
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;margin-top:26px}
+  .ba .col{text-align:center}
+  .ba .yr{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+  .ba .big{font-size:64px;font-weight:800;letter-spacing:-2px}
+  .ba .col.bad .big{color:#ff6b6b}
+  .ba .col.good .big{color:var(--green)}
+  .ba .arrow{font-size:34px;color:var(--accent)}
+  /* simulator */
+  .sim{display:grid;grid-template-columns:300px 1fr;gap:20px;margin-top:18px}
+  .sim .panel-l{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px}
+  .sim .panel-r{background:#0c1c34;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:0;overflow:hidden;display:flex;flex-direction:column;min-height:430px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700}
+  .field input,.field select{width:100%;background:#0c1c34;border:1px solid rgba(255,255,255,.16);color:var(--ink);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13.5px}
+  .crm-head{background:linear-gradient(90deg,#0f2647,#0c1c34);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+  .crm-head .obj{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .crm-head .nm{font-size:17px;font-weight:700;margin-top:2px}
+  .crm-body{padding:16px 18px;flex:1;overflow-y:auto}
+  .crm-body::-webkit-scrollbar{width:8px}.crm-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:6px}
+  .feed-empty{height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13.5px;text-align:center;flex-direction:column;gap:8px}
+  .event{border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px 14px;margin-bottom:11px;background:rgba(255,255,255,.02);opacity:0;transform:translateX(14px);animation:slidein .42s forwards}
+  @keyframes slidein{to{opacity:1;transform:none}}
+  .event .ev-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .event .ev-actor{font-size:12.5px;font-weight:700}
+  .event .ev-body{font-size:13px;color:var(--muted);line-height:1.5}
+  .doclist{margin:8px 0 0;padding:0;list-style:none}
+  .doclist li{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);padding:4px 0}
+  .doclist li .ck{color:var(--green);font-weight:800}
+  .note{background:#0a1830;border:1px dashed rgba(255,179,71,.4);border-radius:10px;padding:11px 13px;margin-top:8px;font-size:12px;color:#d9e6f7;line-height:1.55;white-space:pre-wrap}
+  .meter{display:flex;align-items:center;gap:18px;margin-top:16px;flex-wrap:wrap}
+  .meter .bignum{font-size:46px;font-weight:800;color:var(--green);letter-spacing:-1.5px;min-width:56px;text-align:center}
+  .meter .lbl{font-size:13px;color:var(--muted);line-height:1.45;max-width:360px}
+  .roster{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .roster button{appearance:none;font-family:inherit;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.03);color:var(--muted);font-size:11.5px;border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s}
+  .roster button:hover{color:var(--ink);border-color:var(--accent)}
+  /* spine */
+  .spine{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px}
+  .stage-card{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:14px;cursor:pointer;transition:.18s;position:relative}
+  .stage-card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .stage-card .sn{font-size:11px;color:var(--muted);font-weight:700}
+  .stage-card h4{margin:6px 0 8px;font-size:13.5px;line-height:1.25}
+  .stage-card.bottleneck{border-color:rgba(255,122,26,.6);box-shadow:0 0 0 1px rgba(255,122,26,.25)}
+  .stage-detail{margin-top:18px;background:#0c1c34;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 22px;min-height:120px}
+  .stage-detail .dt-actor{font-size:13px;color:var(--accent2);font-weight:700;margin-bottom:6px}
+  .stage-detail h3{margin:0 0 8px;font-size:20px}
+  .stage-detail p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.55;max-width:760px}
+  .stage-detail .vline{color:var(--green);font-size:13.5px;font-weight:600}
+  /* architecture */
+  .arch{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px}
+  .arch .layer{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;border-top:3px solid}
+  .arch .layer.l1{border-top-color:var(--live)}
+  .arch .layer.l2{border-top-color:var(--agent)}
+  .arch .layer.l3{border-top-color:var(--pkg)}
+  .arch .layer h3{margin:0 0 4px;font-size:16px}
+  .arch .layer .sub{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .arch ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.6}
+  /* rtm table */
+  .rtm{width:100%;border-collapse:collapse;margin-top:18px;font-size:13px}
+  .rtm th,.rtm td{text-align:left;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .rtm th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+  .rtm td.id{font-family:ui-monospace,Menlo,monospace;color:var(--accent2);font-size:12.5px;white-space:nowrap}
+  .rtm tr:hover td{background:rgba(255,255,255,.03)}
+  /* guardrail */
+  .guard{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .guard .g{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px}
+  .guard .g .ai{color:var(--teal);font-weight:700;font-size:13px;margin-bottom:6px}
+  .guard .g .hu{color:var(--accent2);font-weight:700;font-size:13px;margin-bottom:6px}
+  .guard .g p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+  .hint{position:fixed;bottom:80px;right:34px;font-size:11px;color:var(--muted);opacity:.7}
+  @media (max-width:1080px){
+    .sim{grid-template-columns:1fr}.spine{grid-template-columns:repeat(2,1fr)}
+    .arch,.guard{grid-template-columns:1fr}.ba{grid-template-columns:1fr}
+    h1{font-size:34px}.cover h1{font-size:38px}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <div class="mark">AΩ</div>
+        <div><b>Alpha Omega</b> <span>· National Security Solutions</span></div>
+      </div>
+    </div>
+    <div class="topmeta">
+      <span class="pill">Army <b>AIE</b> · Accessions Information Environment</span>
+      <span class="pill">Built live in <b>Salesforce</b></span>
+    </div>
+  </div>
+
+  <!-- PROGRESS RAIL -->
+  <div class="rail" id="rail"></div>
+
+  <!-- SLIDES -->
+  <div class="slides" id="slides">
+
+    <!-- 0 COVER -->
+    <section class="slide active">
+      <div class="wrap cover">
+        <div class="kicker">Interactive Walkthrough · for AIE Product Owners</div>
+        <h1>AI that attacks accessions cycle time — proven live, not promised.</h1>
+        <p class="lead">One fact about a cadet goes in. A complete, AI-assisted documentation package comes out — every time. Native automation where Einstein/Agentforce is licensed, and an external agent delivering the identical outcome everywhere else. Humans keep every eligibility, suitability, and clearance decision.</p>
+        <div class="tags">
+          <div class="tag"><b>4</b> automation layers demonstrated</div>
+          <div class="tag"><b>10</b> lifecycle stages mapped to the RTM</div>
+          <div class="tag"><b>Live</b> in a real Salesforce org</div>
+        </div>
+        <div style="margin-top:30px"><button class="btn primary" onclick="go(1)">Start the walkthrough →</button></div>
+      </div>
+    </section>
+
+    <!-- 1 PROBLEM -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">The problem</div>
+        <h2>The delay doesn't live in the forms. It lives in the back-and-forth.</h2>
+        <p class="lead">In 2020 a recruit could enlist in under a week. Today it's routinely 30–45 days — and the time is lost in medical reviews, waivers, and document chase cycles, while policy changes constantly. Applicants drift and are lost during the wait. Forms aren't the bottleneck; <b style="color:var(--ink)">the iterative request-wait-resubmit loop is.</b></p>
+        <div class="ba">
+          <div class="col bad"><div class="yr">2020</div><div class="big">&lt;7</div><div class="small">days to enlist</div></div>
+          <div class="arrow">→</div>
+          <div class="col bad"><div class="yr">Today</div><div class="big">30–45</div><div class="small">days — lost to medical & documentation loops</div></div>
+        </div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:30px">
+          <div class="card"><h3>Every loop costs days</h3><p>Each "we also need X" from the government is another round trip with the applicant — days of dead time, repeated for each missing document.</p></div>
+          <div class="card"><h3>Policy never sits still</h3><p>Required documents per medical factor change frequently. Hard-coded processes go stale; the work becomes re-training and rework.</p></div>
+          <div class="card"><h3>Minimal AI today</h3><p>Current tooling is largely manual and legacy. The opportunity for AO is to compress the loop with governed automation.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 MODEL -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">The model</div>
+        <h2>One connected, instrumented case for the cadet's whole journey.</h2>
+        <p class="lead">Everything becomes a single <b style="color:var(--ink)">Cadet Case</b> with child <b style="color:var(--ink)">Document Requests</b>, a Medical Factor, and SF-86 status. Capture once, reuse everywhere — no re-keying — so automation has a clean spine to run on and every cycle is measured.</p>
+        <div class="grid" style="grid-template-columns:1.2fr 1fr;margin-top:24px">
+          <div class="card">
+            <h3>Cadet Case <span class="chip rtm">RTM 3.10</span></h3>
+            <p style="margin-bottom:12px">The parent record — path/branch, cycle stage, medical factor, SF-86 status, contract date.</p>
+            <ul class="doclist">
+              <li><span class="ck">›</span> Child: Document Requests (predicted, requested, received)</li>
+              <li><span class="ck">›</span> Status sync to DoDMERB & DCSA interfaces <span class="chip rtm" style="margin-left:6px">3.3.1.7 · 3.4.4.25</span></li>
+              <li><span class="ck">›</span> Activity timeline = the instrumented cycle-time meter</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Why it matters</h3>
+            <p>A connected case is what lets one input trigger the right automation, lets an agent complete a checklist without re-asking, and lets leadership see cycle time as data instead of anecdote.</p>
+            <div class="legend" style="margin-top:14px">
+              <span><span class="chip live">●&nbsp;LIVE native</span></span>
+              <span><span class="chip agent">●&nbsp;LIVE agent</span></span>
+              <span><span class="chip pkg">●&nbsp;Packaged (Einstein/Agentforce)</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 SIMULATOR -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">The automation, live</div>
+        <h2>Run an accession. Watch the package build itself.</h2>
+        <p class="lead">Pick a cadet and a medical factor, then save. The native Flow fires first; an external agent completes the full policy-driven checklist; the case copilot drafts an AI summary and applicant request; an admin agent queues the recruiter task. This is exactly what was run live in the org.</p>
+        <div class="sim">
+          <div class="panel-l">
+            <div class="field"><label>Cadet name</label><input id="cName" value="Jordan A. Maxwell"></div>
+            <div class="field"><label>Accession path</label>
+              <select id="cPath">
+                <option>National 4-Yr Scholarship (Cyber)</option>
+                <option>Green-to-Gold (Cyber)</option>
+                <option>On-Campus (Nurse)</option>
+                <option>On-Campus (Aviation)</option>
+                <option>Green-to-Gold (Infantry)</option>
+              </select>
+            </div>
+            <div class="field"><label>Medical factor (the trigger)</label>
+              <select id="cFactor">
+                <option>ADHD/anxiety medication history</option>
+                <option>Asthma after age 13</option>
+                <option>Prior orthopedic injury or surgery</option>
+                <option>Vision correction (LASIK/PRK)</option>
+              </select>
+            </div>
+            <button class="btn primary" id="runBtn" style="width:100%;margin-top:4px" onclick="runSim()">＋ Save Cadet Case &amp; run automation</button>
+            <div class="small" style="margin-top:10px">Quick-load roster:</div>
+            <div class="roster" id="roster"></div>
+            <button class="btn" style="width:100%;margin-top:12px" onclick="resetSim()">Reset</button>
+          </div>
+          <div class="panel-r">
+            <div class="crm-head">
+              <div><div class="obj">Cadet Case</div><div class="nm" id="crmName">— no record yet —</div></div>
+              <div class="chip rtm" id="crmFactor">awaiting input</div>
+            </div>
+            <div class="crm-body" id="feed">
+              <div class="feed-empty"><div style="font-size:30px">🗂️</div><div>Save a cadet on the left to watch the automations fire in sequence.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="bignum" id="meterNum">0</div>
+          <div class="lbl"><b style="color:var(--ink)">AI-generated documents.</b> Each row was created by automation, not a person — every one is a request-wait-resubmit cycle eliminated, ≈ days of cycle time saved. The count climbs in real time as you run more cadets.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 SPINE -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">The full spine</div>
+        <h2>Automation at every stage — tip to tail.</h2>
+        <p class="lead">Click any stage to see the automation, what it does, and the value line. The medical/waiver stage (highlighted) is the bottleneck we proved live.</p>
+        <div class="spine" id="spine"></div>
+        <div class="stage-detail" id="stageDetail">
+          <div class="dt-actor">Tap a stage above</div>
+          <h3>The accessions lifecycle, instrumented</h3>
+          <p>Each stage carries a specific automation mapped to an AIE RTM requirement. Native where licensed, external agent everywhere else — the recruiter experience and the cycle-time win are identical.</p>
+        </div>
+        <div class="legend" style="margin-top:14px">
+          <span><span class="chip live">●&nbsp;LIVE native</span> record-triggered Flow</span>
+          <span><span class="chip agent">●&nbsp;LIVE agent</span> external agent in the org</span>
+          <span><span class="chip pkg">●&nbsp;Packaged</span> Einstein / Agentforce when licensed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 ARCHITECTURE -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">How it works</div>
+        <h2>Hybrid AI: native where licensed, external agent everywhere else.</h2>
+        <p class="lead">The same outcome — documents, AI case notes, recruiter tasks — produced in any edition. That means the demo runs identically and clean every time, and the path to a fully licensed Agentforce org is a swap, not a rebuild.</p>
+        <div class="arch">
+          <div class="layer l1">
+            <h3>Native automation</h3>
+            <div class="sub">Built & running in the org</div>
+            <ul>
+              <li>Record-triggered Flow on Cadet Case save</li>
+              <li>Predicted Document Requests created automatically</li>
+              <li>Status sync across the case</li>
+              <li>A factor or form change = a config/table edit, minutes not a dev cycle</li>
+            </ul>
+          </div>
+          <div class="layer l2">
+            <h3>External agent</h3>
+            <div class="sub">Identical outcome, any edition</div>
+            <ul>
+              <li>Completes the full policy-driven document checklist</li>
+              <li>Writes the AI case summary + drafted applicant request (Einstein replacement)</li>
+              <li>Queues the recruiter follow-up task (admin agent)</li>
+              <li>Idempotent — never duplicates what the native Flow seeded</li>
+            </ul>
+          </div>
+          <div class="layer l3">
+            <h3>Licensed AI layer</h3>
+            <div class="sub">Drop-in when Agentforce is on</div>
+            <ul>
+              <li>Einstein prompt templates for case summaries</li>
+              <li>Agentforce Accessions Assistant</li>
+              <li>Same orchestration — agents just become native</li>
+              <li>Scales headless on a schedule for new cadets</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 VALUE -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">Value &amp; scale</div>
+        <h2>The money slide: cycles eliminated, in real time.</h2>
+        <p class="lead">Every auto-generated document is a back-and-forth the applicant never has to wait through. Multiply across ~30K cadets, 14K scholarships, and the enlisted pipeline of ~135K recruits, and the cycle-time recovery compounds.</p>
+        <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:22px">
+          <div class="card"><div class="stat green" id="valDocs">0</div><div class="small">AI-generated documents this session</div></div>
+          <div class="card"><div class="stat accent" id="valCadets">0</div><div class="small">cadets processed in the simulator</div></div>
+          <div class="card"><div class="stat">~3–5</div><div class="small">round-trip days saved per document, typical</div></div>
+          <div class="card"><div class="stat">60-day</div><div class="small">SECRET window protected by earlier, complete packets <span class="chip rtm">3.4.4.18</span></div></div>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:18px">
+          <div class="card"><h3>One fact in, the full package out</h3><p>Create a cadet, the checklist completes, the copilot drafts the outreach, the task is queued — identical every time, at scale.</p></div>
+          <div class="card"><h3>Agent at scale</h3><p>The headless agent queries new cadets and applies the whole package on a schedule — the simulator you just ran, running unattended across the pipeline.</p></div>
+        </div>
+        <p class="small" style="margin-top:16px">Per-document day savings shown are illustrative planning figures for this walkthrough, not measured program metrics.</p>
+      </div>
+    </section>
+
+    <!-- 7 RTM -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">Requirements traceability</div>
+        <h2>Mapped to the AIE Functional RTM.</h2>
+        <p class="lead">The automations aren't generic — each ties to a documented AIE requirement, in a COTS, commercial-cloud, FedRAMP+/IL4 posture.</p>
+        <table class="rtm">
+          <thead><tr><th>Capability</th><th>RTM ID</th><th>What the automation does</th><th>Layer</th></tr></thead>
+          <tbody id="rtmBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 8 GUARDRAILS -->
+    <section class="slide">
+      <div class="wrap">
+        <div class="kicker">Trust &amp; governance</div>
+        <h2>AI surfaces, drafts, and automates. Humans decide.</h2>
+        <p class="lead">Consistent with SEAD 4 and accessions policy, AI never makes an eligibility, selection, suitability, or clearance determination. It removes the wait, not the judgment.</p>
+        <div class="guard">
+          <div class="g"><div class="ai">AI does</div><p>Predicts and creates the document checklist, drafts the applicant request, summarizes the case, queues the recruiter task, syncs status, and counts cycle time.</p></div>
+          <div class="g"><div class="hu">Human does</div><p>Approves every applicant send, makes every eligibility / suitability / selection / clearance decision, and signs off before anything leaves the org.</p></div>
+          <div class="g"><div class="ai">Built-in controls</div><p>Idempotent automation (no duplicate or runaway actions), IL4 hosting <span class="chip rtm">1.11.1.59</span>, PII/PHI handling <span class="chip rtm">1.11.1.75</span>, full activity audit trail.</p></div>
+          <div class="g"><div class="hu">Adapt safely</div><p>New policy = a reviewed config/table change. The decision rules stay visible and governed — no opaque model deciding outcomes.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 CLOSE -->
+    <section class="slide">
+      <div class="wrap cover">
+        <div class="kicker">What we proved</div>
+        <h1>Native where licensed, external agent everywhere else — same recruiter experience, same cycle-time win.</h1>
+        <p class="lead">Live in a real Salesforce org: a cadet saved → the native Flow seeded a document → an agent completed the checklist, wrote the AI case note, and queued the task → the value meter climbed. The deploy-ready package turns this into an Agentforce/Einstein-native capability whenever the license is on. Humans keep every decision.</p>
+        <div class="tags">
+          <div class="tag"><b>Proven</b> not promised</div>
+          <div class="tag"><b>Repeatable</b> clean every run</div>
+          <div class="tag"><b>Governed</b> SEAD 4 by design</div>
+          <div class="tag"><b>AO</b> Salesforce · MuleSoft · DocuSign · DevSecOps</div>
+        </div>
+        <div style="margin-top:30px;display:flex;gap:12px">
+          <button class="btn primary" onclick="go(3)">↺ Re-run the simulator</button>
+          <button class="btn" onclick="go(0)">Back to start</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <button class="btn" id="prevBtn" onclick="go(cur-1)">← Prev</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn primary" id="nextBtn" onclick="go(cur+1)">Next →</button>
+  </div>
+</div>
+<div class="hint">← → arrow keys to navigate</div>
+
+<script>
+/* ---------- data ---------- */
+const FACTOR_DOCS = {
+  "ADHD/anxiety medication history":["Pharmacy records (7-yr history)","Prescribing provider notes & treatment dates","Statement of current functioning (med-free period)","School accommodation records (if any)"],
+  "Asthma after age 13":["Pulmonary function test (PFT)","Provider treatment history (asthma)","Methacholine challenge test (if required)"],
+  "Prior orthopedic injury or surgery":["Operative report","Imaging (X-ray/MRI)","Physical therapy notes","Range-of-motion exam"],
+  "Vision correction (LASIK/PRK)":["Surgical operative report","Pre/post-op visual acuity","Surgeon clearance letter"]
+};
+const ROSTER = [
+  ["Jordan A. Maxwell","National 4-Yr Scholarship (Cyber)","ADHD/anxiety medication history"],
+  ["Alex Rivera","Green-to-Gold (Cyber)","ADHD/anxiety medication history"],
+  ["Maria Chen","On-Campus (Nurse)","Asthma after age 13"],
+  ["Priya Nair","On-Campus (Aviation)","Vision correction (LASIK/PRK)"],
+  ["Marcus Hill","Green-to-Gold (Infantry)","Prior orthopedic injury or surgery"]
+];
+const STAGES = [
+  {n:1,t:"Lead & application",actor:"Conversational / guided intake",chip:"pkg",rtm:"CRM 2.1.4",d:"Guided, conversational intake pre-fills the case from what's already known.",v:"Capture once, reuse everywhere — no re-keying."},
+  {n:2,t:"Pre-screen & eligibility",actor:"Eligibility rules + suitability assist",chip:"pkg",rtm:"2.3.1.6 · 3.8.1.1",d:"Automated rules check eligibility and flag suitability items before they enter the pipeline.",v:"Errors caught before they cost cycle time."},
+  {n:3,t:"Medical / waiver — the bottleneck",actor:"Proactive document automation",chip:"live",rtm:"RPA 3.8",d:"A record-triggered Flow creates the predicted documents the moment a cadet is saved with a medical factor.",v:"The government's next request, asked for upfront.",bottleneck:true},
+  {n:4,t:"Full checklist (any factor)",actor:"External agent",chip:"agent",rtm:"1.3 · 3.3",d:"The agent completes the full policy-driven document set for any factor — what the native flow/edition can't.",v:"Fills the gap with the identical outcome."},
+  {n:5,t:"Case copilot",actor:"External agent (Einstein replacement)",chip:"agent",rtm:"3.10",d:"Writes a case summary, gap check, and a drafted applicant request as a Note for staff to approve.",v:"Agentforce-style output, produced anywhere."},
+  {n:6,t:"Recruiter worklist",actor:"Admin agent",chip:"agent",rtm:"3.8",d:"Creates a high-priority follow-up task so the right human acts at the right moment.",v:"Recruiters recruit; agents track paperwork."},
+  {n:7,t:"DoDMERB / SF-86",actor:"Status sync + SF-86 validation",chip:"pkg",rtm:"3.3.1.7 · 3.4.4.18-.25",d:"Syncs medical/clearance status and pre-fills & validates SF-86; protects the 60-day SECRET SLA.",v:"Protect the 60-day SECRET window."},
+  {n:8,t:"Selection boards",actor:"Packet assembly + completeness scoring",chip:"pkg",rtm:"2.1.4.7",d:"Assembles board packets and scores completeness — boards only see complete packets. Humans decide.",v:"No incomplete packet wastes a board's time."},
+  {n:9,t:"Contracting & onboarding",actor:"DocuSign generate-and-sign",chip:"pkg",rtm:"1.3 · 3.4.4",d:"Generates and routes contracts for signature with full orchestration and tracking.",v:"Same-day, tracked, clean activation."},
+  {n:10,t:"Commission / accession",actor:"Eligibility validation, OML, orders",chip:"pkg",rtm:"4.7",d:"Validates final eligibility, builds the order of merit list, and generates accession orders.",v:"Cohort built, cleanly accessioned."}
+];
+const RTM_ROWS = [
+  ["Proactive document automation (RPA)","3.8","Record-triggered Flow + agent create predicted documents","live"],
+  ["Forms generation & management","1.3","Document Requests created and tracked per factor","agent"],
+  ["System integration","1.10 · 3.3","Case spine ready for MuleSoft API integration","pkg"],
+  ["Pre-screen / eligibility","2.3.1.6","Automated eligibility checks at intake","pkg"],
+  ["Suitability assist","3.8.1.1","Flags surfaced for human determination","pkg"],
+  ["DoDMERB interface","3.3.1.7","Medical status sync","pkg"],
+  ["SF-86 / SECRET clearance","3.4.4.18","60-day SECRET window protected","pkg"],
+  ["Continuous screening","3.4.4.20","Status kept current","pkg"],
+  ["DCSA interface","3.4.4.25","Clearance data exchange","pkg"],
+  ["Scholarship / selection boards","2.1.4.7","Packet assembly + completeness scoring","pkg"],
+  ["Cadet management","3.10","One connected Cadet Case","live"],
+  ["Accession orders","4.7","Orders generated at commission","pkg"],
+  ["IL4 hosting","1.11.1.59","FedRAMP+/IL4 commercial cloud posture","pkg"],
+  ["PII / PHI handling","1.11.1.75","Governed handling + audit trail","pkg"]
+];
+
+/* ---------- nav ---------- */
+const slides=[...document.querySelectorAll('.slide')];
+const titles=["Cover","The problem","The model","Live simulator","Automation spine","Architecture","Value & scale","RTM coverage","Guardrails","Close"];
+let cur=0;
+const rail=document.getElementById('rail'), dots=document.getElementById('dots');
+titles.forEach((t,i)=>{
+  const b=document.createElement('button');
+  b.innerHTML='<span class="num">'+String(i).padStart(2,'0')+'</span>'+t;
+  b.onclick=()=>go(i); rail.appendChild(b);
+  const d=document.createElement('div'); d.className='dot'; dots.appendChild(d);
+});
+function go(i){
+  if(i<0||i>=slides.length) return;
+  slides[cur].classList.remove('active'); cur=i; slides[cur].classList.add('active');
+  slides[cur].scrollTop=0;
+  [...rail.children].forEach((b,j)=>b.classList.toggle('active',j===i));
+  [...dots.children].forEach((d,j)=>d.classList.toggle('active',j===i));
+  document.getElementById('prevBtn').disabled=(i===0);
+  document.getElementById('nextBtn').disabled=(i===slides.length-1);
+  syncValue();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+
+/* ---------- simulator ---------- */
+let docCount=0, cadetCount=0, running=false;
+const feed=document.getElementById('feed');
+function rosterInit(){
+  const r=document.getElementById('roster');
+  ROSTER.forEach(c=>{const b=document.createElement('button');b.textContent=c[0].split(' ')[0]+' · '+c[2].split(' ')[0];
+    b.onclick=()=>{document.getElementById('cName').value=c[0];document.getElementById('cPath').value=c[1];document.getElementById('cFactor').value=c[2];};
+    r.appendChild(b);});
+}
+rosterInit();
+function ev(actor,chip,bodyHTML,delay){
+  return new Promise(res=>setTimeout(()=>{
+    const d=document.createElement('div');d.className='event';
+    d.innerHTML='<div class="ev-top"><span class="ev-actor">'+actor+'</span><span class="chip '+chip+'">'+chipLabel(chip)+'</span></div><div class="ev-body">'+bodyHTML+'</div>';
+    feed.appendChild(d); feed.scrollTop=feed.scrollHeight; res();
+  },delay));
+}
+function chipLabel(c){return c==='live'?'LIVE native':c==='agent'?'LIVE agent':'Packaged';}
+function bump(n){
+  docCount+=n;
+  const m=document.getElementById('meterNum');
+  m.textContent=docCount; m.animate([{transform:'scale(1.4)',color:'#fff'},{transform:'scale(1)'}],{duration:380});
+  syncValue();
+}
+function syncValue(){
+  document.getElementById('valDocs').textContent=docCount;
+  document.getElementById('valCadets').textContent=cadetCount;
+}
+async function runSim(){
+  if(running) return; running=true;
+  document.getElementById('runBtn').disabled=true;
+  const name=document.getElementById('cName').value||'New Cadet';
+  const path=document.getElementById('cPath').value;
+  const factor=document.getElementById('cFactor').value;
+  const docs=FACTOR_DOCS[factor]||[];
+  feed.innerHTML='';
+  document.getElementById('crmName').textContent=name+' — '+path;
+  document.getElementById('crmFactor').textContent=factor;
+  cadetCount++; syncValue();
+
+  await ev('Salesforce','live','Cadet Case <b>'+name+'</b> saved · path: '+path+' · medical factor set, SF-86: Not started.',250);
+  await ev('Native Flow','live','Record-triggered automation fired. Created first predicted document:<ul class="doclist"><li><span class="ck">✓</span>'+docs[0]+'</li></ul>',650);
+  bump(1);
+  await ev('Document Agent','agent','Completed the full policy-driven checklist for <b>'+factor+'</b>:'+
+    '<ul class="doclist">'+docs.slice(1).map(d=>'<li><span class="ck">✓</span>'+d+'</li>').join('')+'</ul>',900);
+  bump(docs.length-1);
+  await ev('Case Copilot','agent','Wrote an AI case note for staff review:'+
+    '<div class="note">CASE SUMMARY — '+name+' ('+path+')\nStage: Medical review · SF-86: Not started · '+docs.length+' documents requested ('+factor+').\nNext best action: send the document request and open the SF-86 to protect the 60-day SECRET window.\n\nDRAFT to applicant (for staff approval): "Hi '+name.split(' ')[0]+', to keep your file moving we need: '+docs.slice(0,2).join(', ')+' (full list attached). Reply with these and we\'ll advance your packet." [DRAFT — not sent]</div>',1050);
+  await ev('Admin Agent','agent','Queued recruiter task — <b>High priority</b>: "Send document request to '+name+'" · due in 7 days. <span style="color:var(--accent2)">Awaiting human approval before any send.</span>',900);
+  running=false; document.getElementById('runBtn').disabled=false;
+}
+function resetSim(){
+  if(running) return;
+  docCount=0;cadetCount=0;
+  document.getElementById('meterNum').textContent='0';
+  document.getElementById('crmName').textContent='— no record yet —';
+  document.getElementById('crmFactor').textContent='awaiting input';
+  feed.innerHTML='<div class="feed-empty"><div style="font-size:30px">🗂️</div><div>Save a cadet on the left to watch the automations fire in sequence.</div></div>';
+  syncValue();
+}
+
+/* ---------- spine ---------- */
+const spine=document.getElementById('spine');
+STAGES.forEach(s=>{
+  const c=document.createElement('div');c.className='stage-card'+(s.bottleneck?' bottleneck':'');
+  c.innerHTML='<div class="sn">STAGE '+s.n+'</div><h4>'+s.t+'</h4><span class="chip '+s.chip+'">'+chipLabel(s.chip)+'</span>';
+  c.onclick=()=>showStage(s,c);
+  spine.appendChild(c);
+});
+function showStage(s,el){
+  [...spine.children].forEach(x=>x.style.outline='');
+  el.style.outline='2px solid var(--accent)';
+  document.getElementById('stageDetail').innerHTML=
+    '<div class="dt-actor">'+s.actor+' &nbsp;·&nbsp; <span class="chip '+s.chip+'">'+chipLabel(s.chip)+'</span> &nbsp; <span class="chip rtm">RTM '+s.rtm+'</span></div>'+
+    '<h3>Stage '+s.n+' — '+s.t+'</h3><p>'+s.d+'</p><div class="vline">▸ '+s.v+'</div>';
+}
+
+/* ---------- rtm ---------- */
+const rtmBody=document.getElementById('rtmBody');
+RTM_ROWS.forEach(r=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td>'+r[0]+'</td><td class="id">'+r[1]+'</td><td style="color:var(--muted)">'+r[2]+'</td><td><span class="chip '+r[3]+'">'+chipLabel(r[3])+'</span></td>';
+  rtmBody.appendChild(tr);
+});
+
+go(0);
+</script>
+</body>
+</html>

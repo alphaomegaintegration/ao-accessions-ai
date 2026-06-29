@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AIE AI Accelerator — Interactive Demo · Alpha Omega</title>
+<style>
+  :root{
+    --navy:#1F2A44; --navy2:#27324F; --teal:#0E7C7B; --teal2:#13a39f; --ice:#CFE3E3;
+    --bg:#eef2f5; --card:#ffffff; --ink:#243044; --grey:#5A6675; --line:#dce3e8;
+    --gold:#8A6D00; --good:#1f8a5b; --warnbg:#fff4e0; --warn:#9a6a00; --sage:#eaf2ea;
+    --shadow:0 6px 20px rgba(31,42,68,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+  /* header */
+  header{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .hbar{display:flex;align-items:center;gap:16px;padding:13px 22px;max-width:1180px;margin:0 auto}
+  .logo{font-weight:800;letter-spacing:.5px;font-size:18px}
+  .logo small{display:block;font-weight:500;font-size:11px;color:var(--ice);letter-spacing:.3px}
+  .htitle{font-size:14px;color:#c7d2dc;margin-left:6px;border-left:1px solid #3a4762;padding-left:16px}
+  .sim{margin-left:auto;background:#3a4762;color:#dfe7ef;font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;border:1px solid #4a587a}
+  /* tabs */
+  nav.tabs{background:#16203a;border-top:1px solid #2c3856}
+  .tabsrow{display:flex;gap:4px;max-width:1180px;margin:0 auto;padding:0 14px;flex-wrap:wrap}
+  .tab{appearance:none;background:none;border:none;color:#aeb9c9;font-size:13.5px;font-weight:600;padding:12px 14px;cursor:pointer;border-bottom:3px solid transparent;font-family:inherit}
+  .tab:hover{color:#fff}
+  .tab.active{color:#fff;border-bottom-color:var(--teal2)}
+  .tab .n{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#2c3856;color:#cfe3e3;font-size:11px;align-items:center;justify-content:center;margin-right:7px;font-weight:700}
+  .tab.active .n{background:var(--teal);color:#fff}
+  /* scene */
+  main{padding:26px 0 60px}
+  .scene{display:none;animation:fade .35s ease}
+  .scene.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h1.scenetitle{font-size:26px;margin:2px 0 4px}
+  .sub{color:var(--grey);font-size:15px;margin:0 0 20px}
+  .pill{display:inline-block;background:var(--ice);color:#0a5b5a;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .grid{display:grid;gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+  .card h3{margin:0 0 4px;font-size:16px;color:var(--navy)}
+  .muted{color:var(--grey);font-size:13px}
+  .btn{appearance:none;font-family:inherit;border:none;border-radius:9px;background:var(--teal);color:#fff;font-weight:700;font-size:13.5px;padding:10px 14px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#0a6463}
+  .btn.ghost{background:#eef4f4;color:var(--teal);border:1px solid #cfe3e3}
+  .btn.ghost:hover{background:#e3efef}
+  .btn.sm{padding:7px 11px;font-size:12.5px;border-radius:8px}
+  .btn.gold{background:var(--gold)} .btn.gold:hover{filter:brightness(.92)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{background:#eef4f4;border:1px solid #cfe3e3;color:#0a5b5a;border-radius:20px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
+  .chip:hover{background:#dcecec}
+  .rid{color:var(--teal);font-weight:700;font-size:11.5px}
+  /* overview */
+  .hero{background:linear-gradient(135deg,#1F2A44,#27324F 60%,#15403f);color:#fff;border-radius:18px;padding:34px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero h1{font-size:30px;margin:0 0 8px}
+  .hero p{color:#cdd8e3;max-width:760px;margin:0 0 4px;font-size:15px}
+  .hero .blob{position:absolute;border-radius:50%;background:rgba(19,163,159,.18)}
+  .qcards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:.18s;display:flex;gap:14px;align-items:flex-start}
+  .qcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(31,42,68,.16);border-color:#bfe0df}
+  .qnum{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}
+  .qcard h3{margin:0 0 4px;font-size:16px;color:var(--navy)}
+  .qcard p{margin:0;font-size:13px;color:var(--grey)}
+  /* scene1 layout */
+  .two{display:grid;grid-template-columns:1fr 400px;gap:18px}
+  @media(max-width:980px){.two{grid-template-columns:1fr}.qcards{grid-template-columns:1fr}}
+  .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .kv b{color:var(--navy)}
+  .stepper{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .step{font-size:11px;padding:5px 9px;border-radius:20px;background:#eef2f5;color:#6a7686;font-weight:600;border:1px solid #e1e7ec}
+  .step.done{background:#e6f3ec;color:#1f8a5b;border-color:#bfe3cd}
+  .step.now{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .copilot{background:#0f1830;border-radius:14px;color:#e7eef7;display:flex;flex-direction:column;height:560px;overflow:hidden;border:1px solid #243156}
+  .cphead{padding:13px 15px;background:#16203a;border-bottom:1px solid #243156;display:flex;align-items:center;gap:9px}
+  .cphead .dot{width:9px;height:9px;border-radius:50%;background:#13a39f;box-shadow:0 0 0 4px rgba(19,163,159,.18)}
+  .cpbody{flex:1;overflow-y:auto;padding:15px;font-size:13.5px}
+  .msg{margin-bottom:14px;animation:fade .3s}
+  .msg .who{font-size:11px;color:#7d8aa3;margin-bottom:3px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .msg.ai .bubble{background:#15233f;border:1px solid #28365a;padding:11px 13px;border-radius:10px;white-space:pre-wrap}
+  .msg.you .bubble{background:#13a39f;color:#04231f;padding:9px 12px;border-radius:10px;font-weight:600;display:inline-block}
+  .flag{background:#3a2a12;border:1px solid #6a4a1c;color:#ffd9a0;border-radius:9px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
+  .hitl{background:#13251f;border:1px solid #1f5b46;color:#9fe7c6;border-radius:9px;padding:9px 11px;font-size:12px;margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cpactions{padding:12px 13px;border-top:1px solid #243156;background:#10182e;display:flex;gap:7px;flex-wrap:wrap}
+  .cpbtn{background:#1c2c4e;border:1px solid #2c3f68;color:#cfe0f5;font-size:12px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit}
+  .cpbtn:hover{background:#243759;color:#fff}
+  /* config */
+  textarea.req{width:100%;min-height:74px;border:1px solid var(--line);border-radius:10px;padding:11px;font-family:inherit;font-size:14px;resize:vertical}
+  .tabsmini{display:flex;gap:6px;margin:14px 0 10px;flex-wrap:wrap}
+  .tabmini{font-size:12.5px;padding:7px 12px;border-radius:8px;background:#eef2f5;border:1px solid var(--line);cursor:pointer;font-weight:600;color:#5a6675}
+  .tabmini.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .out{min-height:170px}
+  table.cfg{width:100%;border-collapse:collapse;font-size:13px}
+  table.cfg th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-size:12px}
+  table.cfg td{border-bottom:1px solid var(--line);padding:8px 10px}
+  table.cfg tr:nth-child(even) td{background:#f6f9fa}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .fnode{background:#eef4f4;border:1px solid #bfe0df;color:#0a5b5a;border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:600;text-align:center}
+  .fnode.start{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .fnode.end{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .farrow{color:#9fb0bd;font-weight:800}
+  .savebar{display:flex;align-items:center;gap:16px;background:linear-gradient(90deg,#e8f3ee,#eef4f4);border:1px solid #cfe3df;border-radius:12px;padding:14px 16px;margin-top:14px}
+  .savebar .big{font-size:26px;font-weight:800;color:var(--teal)}
+  .deploy{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0f1830;color:#9fe7c6;border-radius:10px;padding:13px;font-size:12.5px;min-height:120px;white-space:pre-wrap}
+  /* composer */
+  .palette{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .comp{border:1px solid var(--line);border-radius:11px;padding:12px;cursor:pointer;background:#fff;transition:.15s}
+  .comp:hover{border-color:#bfe0df;background:#f6fbfb}
+  .comp.sel{border-color:var(--teal);background:#eef7f6;box-shadow:0 0 0 2px rgba(14,124,123,.15)}
+  .comp h4{margin:0 0 3px;font-size:13.5px;color:var(--navy)}
+  .comp .meta{font-size:11px;color:var(--grey)}
+  .canvas{background:#f8fafb;border:2px dashed #cdd8df;border-radius:12px;padding:16px;min-height:120px}
+  .estimate{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .estbox{border-radius:12px;padding:14px;text-align:center}
+  .estbox.old{background:#fbebe6;border:1px solid #f0c4b6}
+  .estbox.new{background:#e8f3ee;border:1px solid #bfe3cd}
+  .estbox .lab{font-size:12px;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .estbox .val{font-size:30px;font-weight:800;margin-top:4px}
+  .estbox.old .val{color:#b4503a} .estbox.new .val{color:var(--teal)}
+  /* value */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .kpi .v{font-size:30px;font-weight:800;color:var(--navy)}
+  .kpi .l{font-size:12.5px;color:var(--grey);margin-top:2px}
+  .kpi .d{font-size:12px;font-weight:700;margin-top:7px;color:var(--good)}
+  .kpi .d.bad{color:#b4503a}
+  .timeline{position:relative;margin-top:10px}
+  .tl{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .tlcol{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);position:relative}
+  .tlcol .wk{display:inline-block;background:var(--navy);color:#fff;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px;margin-bottom:8px}
+  .tlcol h4{margin:0 0 6px;font-size:14px;color:var(--navy)}
+  .tlcol ul{margin:0;padding-left:16px;font-size:12.5px;color:var(--ink)}
+  .tlcol li{margin-bottom:4px}
+  .bars{display:flex;align-items:flex-end;gap:26px;height:200px;padding:10px 6px;border-bottom:2px solid var(--line)}
+  .barpair{flex:1;display:flex;gap:8px;align-items:flex-end;justify-content:center;height:100%}
+  .bar{width:38px;border-radius:7px 7px 0 0;position:relative;transition:height 1s cubic-bezier(.2,.8,.2,1)}
+  .bar.b1{background:#c2cad6} .bar.b2{background:var(--teal)}
+  .bar span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--navy)}
+  .barlabels{display:flex;gap:26px;margin-top:8px}
+  .barlabels div{flex:1;text-align:center;font-size:12px;color:var(--grey);font-weight:600}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--grey);margin-top:10px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:middle}
+  footer{color:#8a96a3;font-size:12px;text-align:center;padding:24px}
+  .sectionlabel{font-size:12px;font-weight:800;letter-spacing:.5px;color:var(--teal);text-transform:uppercase;margin:0 0 6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="logo">ALPHA OMEGA<small>Total Mission Automation</small></div>
+    <div class="htitle">AIE AI Accelerator — Interactive Demo</div>
+    <div class="sim">Illustrative · simulated data</div>
+  </div>
+  <nav class="tabs"><div class="tabsrow" id="tabs"></div></nav>
+</header>
+
+<main><div class="wrap">
+
+  <!-- OVERVIEW -->
+  <section class="scene active" id="s0">
+    <div class="hero">
+      <div class="blob" style="width:260px;height:260px;top:-90px;right:-60px"></div>
+      <div class="blob" style="width:160px;height:160px;bottom:-70px;left:30%"></div>
+      <h1>Bringing AI to the Accessions Information Environment</h1>
+      <p>A working demonstration of how Alpha Omega applies AI <b>inside Salesforce</b> to accelerate the Army ROTC accessions lifecycle — answering four questions AIE product owners are asking. Everything here is an illustrative simulation grounded in the AIE Functional RTM, with humans retaining authority over every eligibility, selection, suitability, and clearance decision.</p>
+    </div>
+    <div class="qcards" id="qcards"></div>
+    <p class="muted" style="margin-top:18px">Tip: click a card or a tab above. Each scene is interactive — buttons, prompts, and components respond.</p>
+  </section>
+
+  <!-- SCENE 1 -->
+  <section class="scene" id="s1">
+    <p class="sectionlabel">Question 1</p>
+    <h1 class="scenetitle">How do you use AI within Salesforce?<span class="pill">Einstein / Agentforce pattern</span></h1>
+    <p class="sub">AI lives <i>on the case record</i> as a governed copilot — it reads the Cadet 360, drafts work, and recommends next steps. The human approves. Try the copilot actions on the right.</p>
+    <div class="two">
+      <div class="card">
+        <h3>Cadet 360 — Salesforce Case <span class="muted">· CASE-104R-2271</span></h3>
+        <div class="kv"><span>Cadet</span><b>Jordan A. Maxwell</b></div>
+        <div class="kv"><span>Path</span><b>National 4-Year Scholarship → Cyber branch</b></div>
+        <div class="kv"><span>Contracted</span><b>Day 0 · SECRET required in 60 days <span class="rid">[3.4.4.18]</span></b></div>
+        <div class="kv"><span>SF-86 status</span><b style="color:#b4503a">In progress — 2 gaps</b></div>
+        <div class="kv"><span>DoDMERB</span><b>Qualified <span class="rid">[3.3.1.7]</span></b></div>
+        <div class="kv" style="border:none"><span>Clearance target (Cyber)</span><b>Top Secret flagged <span class="rid">[3.4.4.23]</span></b></div>
+        <p class="muted" style="margin:14px 0 5px;font-weight:700;color:var(--navy)">Lifecycle</p>
+        <div class="stepper">
+          <span class="step done">Lead</span><span class="step done">Application</span><span class="step done">Pre-screen</span>
+          <span class="step done">Interview</span><span class="step done">Medical</span><span class="step done">Board</span>
+          <span class="step done">Offer</span><span class="step now">SF-86 / Clearance</span><span class="step">Enroll</span><span class="step">Commission</span>
+        </div>
+        <div class="savebar" style="margin-top:18px">
+          <div><div class="big" id="s1saved">— hrs</div><div class="muted">est. reviewer time saved on this case</div></div>
+          <div class="muted" style="border-left:1px solid #cfe3df;padding-left:16px">AI drafts; the adjudicator decides. Every action is logged for traceability and SEAD 4 compliance.</div>
+        </div>
+      </div>
+      <div class="copilot">
+        <div class="cphead"><span class="dot"></span><b>AIE Copilot</b><span class="muted" style="margin-left:auto;color:#7d8aa3">governed · in-boundary (IL4)</span></div>
+        <div class="cpbody" id="cpbody">
+          <div class="msg ai"><div class="who">Copilot</div><div class="bubble">Hi — I can summarize this Cadet's case, check the SF-86 for gaps against the 60-day SECRET window, draft an interrogatory, or recommend the next best action. Pick an action below.</div></div>
+        </div>
+        <div class="cpactions">
+          <button class="cpbtn" data-act="summary">Summarize case</button>
+          <button class="cpbtn" data-act="sf86">Check SF-86 gaps</button>
+          <button class="cpbtn" data-act="draft">Draft interrogatory</button>
+          <button class="cpbtn" data-act="nba">Next best action</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2 -->
+  <section class="scene" id="s2">
+    <p class="sectionlabel">Question 2</p>
+    <h1 class="scenetitle">How can AI accelerate software configuration?<span class="pill">Describe → configure → deploy</span></h1>
+    <p class="sub">Describe the change in plain English. The AI proposes the Salesforce configuration — objects/fields, a flow, validation — then stages it through the DevSecOps pipeline for human review. No hand-coding to start.</p>
+    <div class="grid" style="grid-template-columns:1fr;gap:14px">
+      <div class="card">
+        <h3>Describe the change</h3>
+        <div class="chips" style="margin:10px 0 12px">
+          <span class="chip" data-preset="ts">Add Top Secret screening for Cyber-branch cadets</span>
+          <span class="chip" data-preset="waiver">Add a medical-remedial waiver approval step</span>
+          <span class="chip" data-preset="sla">Add a 60-day SF-86 SLA with reminders</span>
+        </div>
+        <textarea class="req" id="reqText" placeholder="e.g., Add Top Secret screening for Cyber-branch cadets…"></textarea>
+        <div style="margin-top:10px"><button class="btn" id="genCfg">⚡ Generate configuration</button>
+          <span class="muted" id="cfgHint" style="margin-left:10px"></span></div>
+      </div>
+      <div class="card" id="cfgResult" style="display:none">
+        <div class="tabsmini" id="cfgTabs">
+          <span class="tabmini active" data-ct="fields">Objects & Fields</span>
+          <span class="tabmini" data-ct="flow">Flow</span>
+          <span class="tabmini" data-ct="valid">Validation</span>
+          <span class="tabmini" data-ct="deploy">DevSecOps deploy</span>
+        </div>
+        <div class="out" id="cfgOut"></div>
+        <div class="savebar">
+          <div><div class="big" id="cfgOld">~3 weeks</div><div class="muted">traditional config + test cycle</div></div>
+          <div style="font-size:26px;color:#9fb0bd">→</div>
+          <div><div class="big" id="cfgNew" style="color:var(--teal)">~2 hours</div><div class="muted">AI-assisted draft to review-ready</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3 -->
+  <section class="scene" id="s3">
+    <p class="sectionlabel">Question 3</p>
+    <h1 class="scenetitle">How can new business processes be implemented faster?<span class="pill">Compose, don't custom-build</span></h1>
+    <p class="sub">New ROTC processes are assembled from pre-built, RTM-mapped accelerators rather than coded from scratch. Click components to add them; the estimate updates live.</p>
+    <div class="two" style="grid-template-columns:1fr 380px">
+      <div class="card">
+        <h3>Accelerator library <span class="muted">· click to add</span></h3>
+        <div class="palette" id="palette" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h3>Assembled process</h3>
+        <div class="canvas" id="canvas"><span class="muted">Add components to compose a process…</span></div>
+        <div class="estimate">
+          <div class="estbox old"><div class="lab">Traditional build</div><div class="val" id="estOld">—</div></div>
+          <div class="estbox new"><div class="lab">AIE accelerators</div><div class="val" id="estNew">—</div></div>
+        </div>
+        <button class="btn ghost sm" id="resetComp" style="margin-top:12px">Reset</button>
+        <button class="btn sm gold" id="shipComp" style="margin-top:12px">▶ Generate process</button>
+        <div class="muted" id="shipMsg" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 -->
+  <section class="scene" id="s4">
+    <p class="sectionlabel">Question 4</p>
+    <h1 class="scenetitle">How do you deliver measurable value in weeks?<span class="pill">Weeks, not months</span></h1>
+    <p class="sub">An incremental, SAFe + DevSecOps delivery puts working capability in front of users fast and measures the impact. Illustrative targets shown — baselined with USACC data during discovery.</p>
+    <div class="kpis" id="kpis" style="margin-bottom:18px"></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px">
+      <div class="card">
+        <h3>Impact: baseline vs. AI-enabled</h3>
+        <div class="bars" id="bars"></div>
+        <div class="barlabels" id="barlabels"></div>
+        <div class="legend"><span><i style="background:#c2cad6"></i>Baseline</span><span><i style="background:#0E7C7B"></i>AI-enabled (target)</span></div>
+        <button class="btn ghost sm" id="replay" style="margin-top:12px">↻ Replay animation</button>
+      </div>
+      <div class="card">
+        <h3>First 8 weeks</h3>
+        <div class="timeline"><div class="tl" id="tl"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Illustrative interactive demo · simulated data · Alpha Omega Integration LLC · grounded in the AIE Functional RTM · humans retain all eligibility, selection, suitability &amp; clearance decisions (SEAD 4).</footer>
+</div></main>
+
+<script>
+/* ---------- nav ---------- */
+const TABS=[["0","Overview"],["1","AI in Salesforce"],["2","Accelerate config"],["3","Faster processes"],["4","Value in weeks"]];
+const tabsEl=document.getElementById('tabs');
+TABS.forEach(([id,label])=>{
+  const b=document.createElement('button');b.className='tab'+(id==="0"?' active':'');
+  b.innerHTML=(id==="0"?'':'<span class="n">'+id+'</span>')+label;
+  b.onclick=()=>go(id);tabsEl.appendChild(b);
+});
+function go(id){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',TABS[i][0]===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==="4") setTimeout(drawBars,150);
+}
+/* overview cards */
+const Q=[["1","How do you use AI within Salesforce?","A governed copilot on the case record — summarize, draft, recommend; the human approves."],
+["2","How can AI accelerate software configuration?","Describe a change in plain English; AI proposes objects, flows & validation, ready for review."],
+["3","How can new business processes be implemented faster?","Compose processes from pre-built, RTM-mapped accelerators instead of custom code."],
+["4","How do you deliver measurable value in weeks?","Incremental SAFe + DevSecOps delivery with KPIs you can see inside the first 8 weeks."]];
+const qc=document.getElementById('qcards');
+Q.forEach(([n,t,d])=>{const el=document.createElement('div');el.className='qcard';el.onclick=()=>go(n);
+  el.innerHTML='<div class="qnum">'+n+'</div><div><h3>'+t+'</h3><p>'+d+'</p></div>';qc.appendChild(el);});
+
+/* ---------- Scene 1: copilot ---------- */
+const cpbody=document.getElementById('cpbody');
+let s1total=0;
+const RESP={
+  summary:{you:"Summarize case",save:0.4,
+    ai:"Case summary — Cadet Maxwell (National 4-Yr → Cyber):\n• Contracted Day 0; SECRET required within 60 days [3.4.4.18]; Cyber branch flags Top Secret [3.4.4.23].\n• DoDMERB qualified [3.3.1.7]; board complete; offer accepted.\n• SF-86 in progress — 2 validation gaps detected (see “Check SF-86 gaps”).\nRecommend prioritizing SF-86 completion; 41 days remain in the SECRET window."},
+  sf86:{you:"Check SF-86 gaps",save:0.6,flag:"2 issues likely to cause investigator rework",
+    ai:"SF-86 continuous validation [3.4.4.20] found:\n1) Residence history has a 4-month gap (Aug–Nov 2024) between entries 3 and 4.\n2) Section 13A employment is missing a supervisor contact phone.\nBoth are common bounce-back causes. I can notify the Cadet via the community portal [2.5] with a pre-filled correction request."},
+  draft:{you:"Draft interrogatory",save:0.7,
+    ai:"Draft interrogatory (for your review & approval):\n“Please clarify your residence from Aug–Nov 2024; the record shows no entry for this period. Provide address, dates, and a verifier. Also provide a daytime phone for your supervisor at the Section 13A employer.”\nGrounded only in the Cadet’s own entries — no fabricated content."},
+  nba:{you:"Next best action",save:0.5,
+    ai:"Recommended next best action:\n→ Send the two SF-86 corrections to the Cadet now (auto-reminder at 48h).\n→ Pre-stage the Top Secret request for Cyber [3.4.4.23] so it triggers on branch confirmation.\nProjected effect: protects the 60-day SECRET window [3.4.4.18] and avoids one investigator bounce-back."}
+};
+function typeBubble(el,text,done){
+  let i=0;el.textContent='';
+  const t=setInterval(()=>{el.textContent=text.slice(0,i++);cpbody.scrollTop=cpbody.scrollHeight;
+    if(i>text.length){clearInterval(t);done&&done();}},9);
+}
+document.querySelectorAll('.cpbtn').forEach(b=>b.onclick=()=>{
+  const r=RESP[b.dataset.act];
+  const you=document.createElement('div');you.className='msg you';
+  you.innerHTML='<div class="who">You</div><span class="bubble">'+r.you+'</span>';cpbody.appendChild(you);
+  if(r.flag){const f=document.createElement('div');f.className='flag';f.innerHTML='⚠ '+r.flag;cpbody.appendChild(f);}
+  const m=document.createElement('div');m.className='msg ai';
+  m.innerHTML='<div class="who">Copilot</div><div class="bubble"></div>';cpbody.appendChild(m);
+  cpbody.scrollTop=cpbody.scrollHeight;
+  typeBubble(m.querySelector('.bubble'),r.ai,()=>{
+    const h=document.createElement('div');h.className='hitl';
+    h.innerHTML='<span>Human-in-the-loop:</span><button class="btn sm" style="padding:5px 10px">Approve</button><button class="btn ghost sm" style="padding:5px 10px">Edit</button><span class="muted" style="color:#6f8aa0">logged for SEAD 4</span>';
+    m.appendChild(h);
+    s1total+=r.save;document.getElementById('s1saved').textContent='~'+s1total.toFixed(1)+' hrs';
+  });
+});
+
+/* ---------- Scene 2: config ---------- */
+const CFG={
+  ts:{title:"Top Secret screening for Cyber-branch cadets",
+    fields:[["Cadet","Branch_Assignment__c","Picklist","Infantry…Cyber…"],["Cadet","Clearance_Level_Required__c","Picklist","SECRET / TOP SECRET (auto)"],["Clearance_Case__c","TS_Justification__c","Long Text","Branch-driven rationale"],["Clearance_Case__c","SF86_Tier__c","Picklist","T3 / T5"]],
+    flow:["Branch = Cyber?","Set Clearance = TOP SECRET [3.4.4.23]","Create T5 SF-86 task [3.4.4.19]","Notify Cadet + Cadre [2.5]","Sync to DCSA SOR [3.4.4.25]"],
+    valid:[["Block contract if TS branch & no SF-86 initiated","Error","Tied to 60-day window [3.4.4.18]"],["Require TS justification when level=TOP SECRET","Error","Audit trail"]],
+  },
+  waiver:{title:"Medical-remedial waiver approval step",
+    fields:[["Medical_Review__c","Remedial_Type__c","Picklist","Vision / Asthma / Ortho…"],["Medical_Review__c","Waiver_Status__c","Picklist","Requested / Approved / Denied"],["Medical_Review__c","DoDMERB_Sync__c","Checkbox","Sync to DoDMERB [3.2.1.15]"]],
+    flow:["Remedial flagged","Assemble waiver packet","Cadre review & submit","Approval (PMS/HQ)","Sync decision to DoDMERB [3.2.1.15]"],
+    valid:[["Require supporting docs before submit","Error","Forms enforced [3.4.4.2]"],["Notify Cadet on decision","Info","Portal [2.5]"]],
+  },
+  sla:{title:"60-day SF-86 SLA with reminders",
+    fields:[["Clearance_Case__c","SF86_Due_Date__c","Date","Contract date + 60 [3.4.4.18]"],["Clearance_Case__c","SLA_Status__c","Picklist","On track / At risk / Breached"],["Clearance_Case__c","Last_Reminder__c","DateTime","Auto-stamp"]],
+    flow:["On contract: set due = +60d","Daily SLA check","Day 30 & 45: remind Cadet","Day 52: escalate to Cadre","Breach: flag + report"],
+    valid:[["Flag At-risk inside 14 days","Warning","Predictive prioritization"],["Dashboard rollup by brigade","Info","Command visibility"]],
+  }
+};
+let curCfg=null,curTab='fields';
+document.querySelectorAll('.chip[data-preset]').forEach(c=>c.onclick=()=>{document.getElementById('reqText').value=c.textContent;});
+document.getElementById('genCfg').onclick=()=>{
+  const t=document.getElementById('reqText').value.toLowerCase();
+  let key='ts';
+  if(t.includes('waiver')||t.includes('remedial')||t.includes('medical'))key='waiver';
+  else if(t.includes('sla')||t.includes('60')||t.includes('remind')||t.includes('deadline'))key='sla';
+  else if(t.includes('top secret')||t.includes('cyber')||t.includes('clearance')||t.includes('screen'))key='ts';
+  curCfg=CFG[key];curTab='fields';
+  document.getElementById('cfgHint').textContent='Interpreted as: “'+curCfg.title+'”';
+  document.getElementById('cfgResult').style.display='block';
+  renderCfgTabs();renderCfg();
+  document.getElementById('cfgResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+function renderCfgTabs(){document.querySelectorAll('.tabmini').forEach(t=>t.classList.toggle('active',t.dataset.ct===curTab));}
+document.querySelectorAll('.tabmini').forEach(t=>t.onclick=()=>{curTab=t.dataset.ct;renderCfgTabs();renderCfg();});
+function renderCfg(){
+  const o=document.getElementById('cfgOut');if(!curCfg)return;
+  if(curTab==='fields'){
+    let h='<table class="cfg"><tr><th>Object</th><th>Field API name</th><th>Type</th><th>Notes</th></tr>';
+    curCfg.fields.forEach(f=>h+='<tr><td>'+f[0]+'</td><td><code>'+f[1]+'</code></td><td>'+f[2]+'</td><td class="muted">'+f[3]+'</td></tr>');
+    o.innerHTML=h+'</table>';
+  }else if(curTab==='flow'){
+    let h='<div class="flow"><span class="fnode start">Start</span>';
+    curCfg.flow.forEach(n=>h+='<span class="farrow">→</span><span class="fnode">'+n+'</span>');
+    o.innerHTML=h+'<span class="farrow">→</span><span class="fnode end">Done</span></div><p class="muted" style="margin-top:10px">Generated as a Salesforce Flow / Orchestration draft [3.2] — reviewable before activation.</p>';
+  }else if(curTab==='valid'){
+    let h='<table class="cfg"><tr><th>Rule</th><th>Severity</th><th>Rationale</th></tr>';
+    curCfg.valid.forEach(v=>h+='<tr><td>'+v[0]+'</td><td>'+v[1]+'</td><td class="muted">'+v[2]+'</td></tr>');
+    o.innerHTML=h+'</table>';
+  }else{
+    o.innerHTML='<div class="deploy" id="dep"></div>';
+    const lines=["$ sfdx force:source:deploy  (AIE sandbox)","› validating metadata… OK","› running Apex + flow tests… 100% pass","› SAST / security scan… 0 criticals","› policy-as-code gate… PASS (IL4 controls)","› awaiting human approval ✔  →  promote to staging","✓ change staged for product-owner review — no production push without sign-off"];
+    const dep=document.getElementById('dep');let i=0;
+    (function nx(){if(i<lines.length){dep.textContent+=lines[i++]+"\n";setTimeout(nx,360);}})();
+  }
+}
+
+/* ---------- Scene 3: composer ---------- */
+const COMPS=[
+  ["Lead & prospect intake","CRM","2.1",2,0.3],
+  ["Conversational application + CBEF","CRM","2.1.4",6,0.6],
+  ["Pre-screen & eligibility rules","Processing","2.3.1.6",4,0.5],
+  ["DoDMERB medical sync","Processing","3.3.1.7",3,0.4],
+  ["Selection board scoring","CRM","2.1.4.7",5,0.6],
+  ["Offer + DocuSign contract","Foundation","1.3",3,0.4],
+  ["SF-86 pre-fill & validation","Processing","3.4.4.20",6,0.7],
+  ["Adjudicator copilot","Processing","3.8.1.1",5,0.6],
+  ["RPA across SORs","Processing","3.8",4,0.5],
+  ["Enroll & Cadet management","Processing","3.10",4,0.5]
+];
+const palette=document.getElementById('palette');
+let chosen=[];
+COMPS.forEach((c,idx)=>{const el=document.createElement('div');el.className='comp';el.dataset.i=idx;
+  el.innerHTML='<h4>'+c[0]+'</h4><div class="meta">'+c[1]+' · <span class="rid">['+c[2]+']</span></div>';
+  el.onclick=()=>{const i=chosen.indexOf(idx);if(i>=0){chosen.splice(i,1);el.classList.remove('sel');}else{chosen.push(idx);el.classList.add('sel');}renderCanvas();};
+  palette.appendChild(el);});
+function renderCanvas(){
+  const cv=document.getElementById('canvas');
+  if(!chosen.length){cv.innerHTML='<span class="muted">Add components to compose a process…</span>';
+    document.getElementById('estOld').textContent='—';document.getElementById('estNew').textContent='—';
+    document.getElementById('shipMsg').textContent='';return;}
+  let h='<div class="flow"><span class="fnode start">Start</span>';
+  chosen.forEach(i=>h+='<span class="farrow">→</span><span class="fnode">'+COMPS[i][0]+'<br><span class="rid">['+COMPS[i][2]+']</span></span>');
+  cv.innerHTML=h+'<span class="farrow">→</span><span class="fnode end">Live</span></div>';
+  let oldW=0,newW=0;chosen.forEach(i=>{oldW+=COMPS[i][3];newW+=COMPS[i][4];});
+  document.getElementById('estOld').textContent=oldW+' mo';
+  document.getElementById('estNew').textContent=newW.toFixed(1)+' wk';
+}
+document.getElementById('resetComp').onclick=()=>{chosen=[];document.querySelectorAll('.comp').forEach(c=>c.classList.remove('sel'));renderCanvas();};
+document.getElementById('shipComp').onclick=()=>{
+  if(!chosen.length){document.getElementById('shipMsg').textContent='Add at least one component first.';return;}
+  const msg=document.getElementById('shipMsg');msg.style.color='var(--teal)';
+  msg.textContent='Composing… configuring objects & flows… running DevSecOps gate…';
+  setTimeout(()=>{msg.innerHTML='✓ Process assembled from '+chosen.length+' accelerators and staged for product-owner review — configuration over custom code.';},1200);
+};
+
+/* ---------- Scene 4: value ---------- */
+const KPI=[["Cycle time","‑42%","application → contracting","good"],
+["First-pass completeness","+31%","fewer SF-86 bounce-backs","good"],
+["On-time SF-86 (60-day)","94%","up from ~70% baseline","good"],
+["Adjudicator hours / case","‑3.4 hrs","RPA + copilot offload","good"]];
+const kpiEl=document.getElementById('kpis');
+KPI.forEach(k=>{const el=document.createElement('div');el.className='kpi';
+  el.innerHTML='<div class="v">'+k[1]+'</div><div class="l">'+k[0]+'</div><div class="d">'+k[2]+'</div>';kpiEl.appendChild(el);});
+const BARS=[["Cycle time",100,58],["SF-86 rework",100,41],["Reviewer hrs",100,52],["Abandonment",100,55]];
+function drawBars(){
+  const bars=document.getElementById('bars'),labels=document.getElementById('barlabels');
+  bars.innerHTML='';labels.innerHTML='';
+  BARS.forEach(b=>{
+    const pair=document.createElement('div');pair.className='barpair';
+    pair.innerHTML='<div class="bar b1" style="height:0"><span>'+b[1]+'</span></div><div class="bar b2" style="height:0"><span>'+b[2]+'</span></div>';
+    bars.appendChild(pair);
+    const l=document.createElement('div');l.textContent=b[0];labels.appendChild(l);
+  });
+  requestAnimationFrame(()=>{const ps=bars.querySelectorAll('.barpair');
+    BARS.forEach((b,i)=>{const bb=ps[i].querySelectorAll('.bar');bb[0].style.height=(b[1]*0.85)+'%';bb[1].style.height=(b[2]*0.85)+'%';});});
+}
+document.getElementById('replay').onclick=drawBars;
+const TL=[["Weeks 1–2","Discover & prototype",["Baseline current state with USACC data","Stand up Salesforce sandbox + MuleSoft stubs","Working clickable prototype of one flow"]],
+["Weeks 3–4","First pilot flow",["SF-86 pre-fill + validation [3.4.4.20]","DocuSign offer/contract [1.3]","DevSecOps pipeline + IL4 gates live"]],
+["Weeks 5–6","Copilot + RPA",["Adjudicator copilot [3.8.1.1]","RPA across DoDMERB/DCSA SORs [3.8]","Human-in-the-loop approvals"]],
+["Weeks 7–8","Measure & scale",["KPI dashboard live","Demo to product owners","Prioritize next increment"]]];
+const tl=document.getElementById('tl');
+TL.forEach(t=>{const el=document.createElement('div');el.className='tlcol';
+  el.innerHTML='<span class="wk">'+t[0]+'</span><h4>'+t[1]+'</h4><ul>'+t[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>';tl.appendChild(el);});
+</script>
+</body>
+</html>
