@@ -4,6 +4,8 @@ A reference implementation and supporting materials for applying **agentic AI to
 
 Built on Salesforce with a **hybrid agentic architecture**: native automation where it runs in-platform, external agents that produce the identical outcome in any edition, and a drop-in path to a fully licensed **Agentforce** deployment.
 
+**Live site:** the interactive demos and documents are published via GitHub Pages at <https://alphaomegaintegration.github.io/ao-accessions-ai/> — see [Live links](#live-links) below.
+
 > **Note on confidentiality.** This repository contains pre-decisional, draft proposal and demonstration material. All candidate ("cadet") data is fictional, and account-specific identifiers (e.g., the demonstration org subdomain and Salesforce record IDs) have been redacted and replaced with placeholders such as `your-org`. The IL5/FedRAMP posture, governed model boundary, and external integrations described here are **target-state** and must be confirmed with the program office before any handling of real applicant data. See `NOTICE.md`.
 
 ## What's inside
@@ -51,15 +53,35 @@ node build_agents_doc.js      # rebuilds the technical description .docx
 
 **View the demos** — open any file in `presentations/demos/` in a web browser.
 
-## Run the demos live on GitHub Pages
+## Live links
 
-GitHub shows HTML as source; to *run* the demos, enable **GitHub Pages** (repo **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `/root` → Save**). A `.nojekyll` file is included so all files are served verbatim. Once published, the site is served from `index.html` and the demos are live at:
+The site is published with **GitHub Pages** at <https://alphaomegaintegration.github.io/ao-accessions-ai/>, deployed from `main` (a `.nojekyll` file ensures every file is served verbatim). PDFs, diagrams, and HTML open directly in the browser; the interactive demos are fully self-contained (no external scripts, no browser storage) and run natively.
 
-- Landing page: `https://alphaomegaintegration.github.io/ao-accessions-ai/`
-- Walkthrough: `https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/demos/AIE_AI_Walkthrough.html`
-- Cycle-time demo: `https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/demos/AIE_CycleTime_Demo.html`
+**Interactive demos**
+- [Landing page](https://alphaomegaintegration.github.io/ao-accessions-ai/)
+- [Agentic Process Walkthrough](https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/demos/AIE_AI_Walkthrough.html) — working simulator with a live value meter
+- [Cycle-Time Demo](https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/demos/AIE_CycleTime_Demo.html) — the recruiter cycle-time story
+- [AI-in-Salesforce Demo](https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/demos/AIE_AI_Demo.html)
 
-Both demos are fully self-contained (no external scripts, no browser storage), so they render and run natively once Pages is enabled.
+**Documents**
+- [AI Agents — Technical Description (PDF)](https://alphaomegaintegration.github.io/ao-accessions-ai/docs/AIE_AI_Agents_Technical_Description.pdf) — architecture, governance (SEAD 4), and RTM traceability
+- [DoW RFI Response (PDF)](https://alphaomegaintegration.github.io/ao-accessions-ai/docs/AlphaOmega_DoW_RFI_Response.pdf)
+- [ROTC AI Modernization (PDF)](https://alphaomegaintegration.github.io/ao-accessions-ai/docs/AlphaOmega_ROTC_AI_Modernization.pdf)
+- [ROTC AI Concept (DOCX)](https://alphaomegaintegration.github.io/ao-accessions-ai/docs/AIE_ROTC_AI_Concept.docx)
+
+**Briefing decks**
+- [AIE ROTC Briefing (PDF)](https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/AIE_ROTC_Briefing.pdf)
+- [Alpha Omega ROTC Briefing (PDF)](https://alphaomegaintegration.github.io/ao-accessions-ai/presentations/AlphaOmega_ROTC_Briefing.pdf)
+
+**Diagrams**
+- [Agentic Process Diagram (SVG)](https://alphaomegaintegration.github.io/ao-accessions-ai/diagrams/AIE_Agentic_Process_Diagram.svg)
+- [AIE ROTC Swimlane (SVG)](https://alphaomegaintegration.github.io/ao-accessions-ai/diagrams/aie_rotc_swimlane.svg)
+- [ROTC Swimlane (SVG)](https://alphaomegaintegration.github.io/ao-accessions-ai/diagrams/rotc_swimlane.svg)
+
+**Run-sheets & guides** (rendered on GitHub)
+- [Live Demo Run-sheet](https://github.com/alphaomegaintegration/ao-accessions-ai/blob/main/docs/run-sheets/AIE_Live_Demo_Runsheet.md)
+- [Tip-to-Tail Demo Run-sheet](https://github.com/alphaomegaintegration/ao-accessions-ai/blob/main/docs/run-sheets/AIE_Tip_to_Tail_Demo_Runsheet.md)
+- [Salesforce Deploy Guide](https://github.com/alphaomegaintegration/ao-accessions-ai/blob/main/salesforce-package/README_Deploy_Guide.md)
 
 ## Governance
 
