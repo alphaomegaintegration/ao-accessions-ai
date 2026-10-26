@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Agentic Accessions Reference", "output": "architecture.html", "quality_profile": "showcase" },
+  "layout": { "mode": "grid", "origin": [40, 60], "cols": 4, "gapX": 80, "gapY": 110 },
+  "components": [
+    { "id": "demo", "type": "frontend", "label": "Demo runner", "sublabel": "demo/ run_demo.sh", "row": 0, "col": 0 },
+    { "id": "runner", "type": "backend", "label": "Agent runner", "sublabel": "agent_runner.py", "row": 0, "col": 1 },
+    { "id": "llm", "type": "external", "label": "LLM API", "sublabel": "drafts text", "row": 0, "col": 2 },
+    { "id": "sfdc", "type": "cloud", "label": "Salesforce org", "sublabel": "force-app metadata", "row": 1, "col": 1 },
+    { "id": "flow", "type": "backend", "label": "Flow logic", "sublabel": "record-triggered", "row": 1, "col": 0 },
+    { "id": "human", "type": "security", "label": "Human approval", "sublabel": "approves every send", "row": 1, "col": 2 },
+    { "id": "builders", "type": "backend", "label": "Build scripts", "sublabel": "build-scripts/ Node", "row": 2, "col": 0 },
+    { "id": "pages", "type": "frontend", "label": "Pages site", "sublabel": "demos, docs, diagrams", "row": 2, "col": 1 }
+  ],
+  "connections": [
+    { "id": "demo-runner", "from": "demo", "to": "runner", "label": "reset, seed, run" },
+    { "id": "runner-llm", "from": "runner", "to": "llm", "label": "prompts" },
+    { "id": "runner-sfdc", "from": "runner", "to": "sfdc", "label": "records", "labelDy": 24 },
+    { "id": "flow-sfdc", "from": "flow", "to": "sfdc", "label": "automates" },
+    { "id": "sfdc-human", "from": "sfdc", "to": "human", "label": "drafts" },
+    { "id": "build-pages", "from": "builders", "to": "pages", "label": "generate" }
+  ],
+  "cards": [
+    { "dot": "rose", "title": "Governed", "items": ["Agents draft; a person approves each applicant send", "Demo data is fictional"] }
+  ]
+}
